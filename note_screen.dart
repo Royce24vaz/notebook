@@ -38,9 +38,36 @@ class NoteScreenState extends State<NoteScreen> {
     }
   }
 
+  void deleteNoteConfirmation(int noteId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Note'),
+          content: const Text('Are you sure you want to delete this note?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteNote(noteId); // Call the actual delete function
+                Navigator.of(context).pop(); // Close the dialog after deletion
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _deleteNote(int noteId) async {
-    await dbService.deleteNote(noteId);
-    _loadNotes();
+    await DatabaseService().deleteNote(noteId);
+    _loadNotes(); // Refresh notes after deletion
   }
 
   @override
@@ -58,7 +85,7 @@ class NoteScreenState extends State<NoteScreen> {
                   title: Text(note['content']),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
-                    onPressed: () => _deleteNote(note['id']),
+                    onPressed: () => deleteNoteConfirmation(note['id']),
                   ),
                 );
               },
@@ -87,3 +114,4 @@ class NoteScreenState extends State<NoteScreen> {
     );
   }
 }
+
